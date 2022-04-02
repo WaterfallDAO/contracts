@@ -32,9 +32,9 @@ contract Controller {
     uint256 public split = 500;
     uint256 public constant max = 10000;
 
-    constructor(address _rewards,address _timelock) public {
+    constructor(address _rewards,address _timelock,address split) public {
         governance = msg.sender;
-        onesplit = address(0x50FDA034C0Ce7a8f7EFDAebDA7Aa7cA21CC1267e);
+        onesplit = split;
         rewards = _rewards;
         timelock = _timelock;
     }
