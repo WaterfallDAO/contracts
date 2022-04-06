@@ -187,14 +187,14 @@ contract Fund is ReentrancyGuard {
                 pool.mirrorStake = pool.mirrorStake.sub(redeem);
                 IERC20(token).safeTransfer(msg.sender, redeem);
                 emit WithdrawStake(msg.sender, _fid, redeem);
-                token.burn(address(this), _amount);
+                token.burn(_amount);
                 pool.currentLPToken = pool.currentLPToken.sub(_amount);
             } else {
                 pool.currentStake = pool.currentStake.sub(user.stake);
                 pool.mirrorStake = pool.mirrorStake.sub(user.stake);
                 IERC20(token).safeTransfer(msg.sender, user.stake);
                 emit WithdrawStake(msg.sender, _fid, user.stake);
-                token.burn(address(this), amount);
+                token.burn(amount);
                 pool.currentLPToken = pool.currentLPToken.sub(amount);
                 user.stake = 0;
                 EnumerableSet.remove(stakeAddress, msg.sender);
@@ -332,7 +332,7 @@ contract Fund is ReentrancyGuard {
                 lengthA--;
             }
             fundA.currentAmount = fundA.currentAmount.sub(amountAReserve);
-            tokenA.burn(address(this), redeemAReserve);
+            tokenA.burn(redeemAReserve);
         }
         if (fundA.mirrorStake >= amountAReserve) {
             fundA.totalRedeem = fundA.totalRedeem.add(amountAReserve);
@@ -375,7 +375,7 @@ contract Fund is ReentrancyGuard {
                 lengthB--;
             }
             fundB.currentAmount = fundB.currentAmount.sub(amountBReserve);
-            tokenB.burn(address(this), redeemBReserve);
+            tokenB.burn(redeemBReserve);
         }
         if (fundB.currentStake >= amountBReserve) {
             fundB.totalRedeem = fundB.totalRedeem.add(amountBReserve);
