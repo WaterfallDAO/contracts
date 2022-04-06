@@ -32,7 +32,7 @@ contract Controller {
     uint256 public split = 500;
     uint256 public constant max = 10000;
 
-    constructor(address _rewards,address _timelock,address split) public {
+    constructor(address _rewards, address _timelock, address split) public {
         governance = msg.sender;
         onesplit = split;
         rewards = _rewards;
@@ -87,7 +87,7 @@ contract Controller {
     function setVault(address _token, address _vault) public {
         require(msg.sender == governance, "!governance");
         require(vaults[_token] == address(0), "vault is 0");
-        require(Vault(_vault).token() == _token, "illegal vault");
+        require(IVault(_vault).token() == _token, "illegal vault");
 
         vaults[_token] = _vault;
     }
@@ -144,7 +144,7 @@ contract Controller {
     ) public view returns (uint256 expected) {
         uint256 _balance = IERC20(_token).balanceOf(_strategy);
         address _want = Strategy(_strategy).want();
-        (expected, ) = OneSplitAudit(onesplit).getExpectedReturn(_token, _want, _balance, parts, 0);
+        (expected,) = OneSplitAudit(onesplit).getExpectedReturn(_token, _want, _balance, parts, 0);
     }
 
     // Only allows to withdraw non-core strategy tokens ~ this is over and above normal yield

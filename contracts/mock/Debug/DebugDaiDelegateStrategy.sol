@@ -135,7 +135,7 @@ contract DebugStrategyMkrDaiDelegate {
             _lockWETHAndDrawDAI(_want, _draw);
         }
         // approve vault use DAI
-        Vault(vault).depositAll();
+        IVault(vault).depositAll();
     }
 
     function _getPrice() public view returns (uint256 p) {
@@ -237,7 +237,7 @@ contract DebugStrategyMkrDaiDelegate {
     }
 
     function _withdrawAll() public {
-        Vault(vault).withdrawAll(); // get Dai
+        IVault(vault).withdrawAll(); // get Dai
         _wipe(getTotalDebtAmount().add(1)); // in case of edge case
         _freeWETH(balanceOfmVault());
     }
@@ -301,7 +301,7 @@ contract DebugStrategyMkrDaiDelegate {
         uint256 _drawD = drawAmount();
         if (_drawD > 0) {
             _lockWETHAndDrawDAI(0, _drawD);
-            Vault(vault).depositAll();
+            IVault(vault).depositAll();
         }
     }
 
@@ -369,24 +369,24 @@ contract DebugStrategyMkrDaiDelegate {
     }
 
     function getUnderlyingDai() public view returns (uint256) {
-        return IERC20(vault).balanceOf(address(this)).mul(Vault(vault).getPricePerFullShare()).div(1e18);
+        return IERC20(vault).balanceOf(address(this)).mul(IVault(vault).getPricePerFullShare()).div(1e18);
     }
 
     function _withdrawDaiMost(uint256 _amount) public returns (uint256) {
-        uint256 _shares = _amount.mul(1e18).div(Vault(vault).getPricePerFullShare());
+        uint256 _shares = _amount.mul(1e18).div(IVault(vault).getPricePerFullShare());
 
         if (_shares > IERC20(vault).balanceOf(address(this))) {
             _shares = IERC20(vault).balanceOf(address(this));
         }
 
         uint256 _before = IERC20(dai).balanceOf(address(this));
-        Vault(vault).withdraw(_shares);
+        IVault(vault).withdraw(_shares);
         uint256 _after = IERC20(dai).balanceOf(address(this));
         return _after.sub(_before);
     }
 
     function _withdrawDaiLeast(uint256 _amount) public returns (uint256) {
-        uint256 _shares = _amount.mul(1e18).div(Vault(vault).getPricePerFullShare()).mul(withdrawalMax).div(
+        uint256 _shares = _amount.mul(1e18).div(IVault(vault).getPricePerFullShare()).mul(withdrawalMax).div(
             withdrawalMax.sub(withdrawalFee)
         );
 
@@ -395,7 +395,7 @@ contract DebugStrategyMkrDaiDelegate {
         }
 
         uint256 _before = IERC20(dai).balanceOf(address(this));
-        Vault(vault).withdraw(_shares);
+        IVault(vault).withdraw(_shares);
         uint256 _after = IERC20(dai).balanceOf(address(this));
         return _after.sub(_before);
     }

@@ -1,6 +1,6 @@
 pragma solidity ^0.8.4;
 
-interface Vault {
+interface IVault {
     function token() external view returns (address);
 
     function deposit(uint256) external;
