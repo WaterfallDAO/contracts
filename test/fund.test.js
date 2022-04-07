@@ -2,7 +2,7 @@ const {BN, expectRevert, time} = require("@openzeppelin/test-helpers");
 const Controller = artifacts.require("Controller");
 const MockERC20 = artifacts.require("MockERC20")
 const TimeLock = artifacts.require("Timelock");
-const bamVault = artifacts.require("Vault");
+const WtfVault = artifacts.require("Vault");
 const MockCurveDeposit = artifacts.require("MockCurveDeposit");
 const MockCurveGauge = artifacts.require("MockCurveGauge");
 const MockUni = artifacts.require("MockUni");
@@ -13,7 +13,7 @@ const Fund = artifacts.require("Fund");
 const MockOneSplit = artifacts.require("MockOneSplitAudit");
 const {toWei} = web3.utils;
 const {BigNumber} = require('ethers');
-const BamFundERC20 = artifacts.require("WTFFundERC20");
+const WtfFundERC20 = artifacts.require("WTFFundERC20");
 
 function encodeParameters(types, values) {
     const abi = new ethers.utils.AbiCoder();
@@ -34,7 +34,7 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         oneSplit = await MockOneSplit.new();
         controller = await Controller.new(rewardAddr, timeLock.address, oneSplit.address);
 
-        vault = await bamVault.new(dai.address, controller.address, "test", "test", timeLock.address);
+        vault = await WtfVault.new(dai.address, controller.address, "test", "test", timeLock.address);
         gauge = await MockCurveGauge.new(crv.address, ycrv.address);
         minter = await MockMinter.new(crv.address);
 
@@ -72,7 +72,7 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         await fof.setVault(vault.address);
         assert.equal(await fof.vault(), vault.address);
 
-        fund = await Fund.new("bamFA", "bamFA", "bamFB", "bamFB", dai.address, 10, fof.address, {from: owner});
+        fund = await Fund.new("FA", "FA", "FB", "FB", dai.address, 10, fof.address, {from: owner});
 
         await fof.setFund(fund.address);
         assert.equal(await fof.fund(), fund.address);
@@ -80,21 +80,21 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         await fund.initialize();
         await usdt.approve(fund.address, toWei('1000'));
         //await usdt.mint(owner, toWei('1'));
-        bamTokenAAddr = await fund.tokenA();
-        bamTokenA = await BamFundERC20.at(bamTokenAAddr);
-        assert.equal(bamTokenA.address, bamTokenAAddr);
+        wtfTokenAAddr = await fund.tokenA();
+        wtfTokenA = await WtfFundERC20.at(wtfTokenAAddr);
+        assert.equal(wtfTokenA.address, wtfTokenAAddr);
 
-        bamTokenBAddr = await fund.tokenB();
-        bamTokenB = await BamFundERC20.at(bamTokenBAddr);
-        assert.equal(bamTokenB.address, bamTokenBAddr);
+        wtfTokenBAddr = await fund.tokenB();
+        wtfTokenB = await WtfFundERC20.at(wtfTokenBAddr);
+        assert.equal(wtfTokenB.address, wtfTokenBAddr);
 
-        await bamTokenA.approve(fund.address, toWei('1000'));
-        await bamTokenB.approve(fund.address, toWei('1000'));
-        await bamTokenA.approve(fund.address, toWei('1000'), {from: alice});
-        await bamTokenB.approve(fund.address, toWei('1000'), {from: alice});
+        await wtfTokenA.approve(fund.address, toWei('1000'));
+        await wtfTokenB.approve(fund.address, toWei('1000'));
+        await wtfTokenA.approve(fund.address, toWei('1000'), {from: alice});
+        await wtfTokenB.approve(fund.address, toWei('1000'), {from: alice});
 
-        assert.equal(await bamTokenA.balanceOf(owner), 0)
-        assert.equal(await bamTokenB.balanceOf(owner), 0)
+        assert.equal(await wtfTokenA.balanceOf(owner), 0)
+        assert.equal(await wtfTokenB.balanceOf(owner), 0)
         await dai.mint(owner, toWei('1'));
         await dai.mint(alice, toWei('1'));
         await dai.approve(fund.address, toWei('1000'));
@@ -115,8 +115,8 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         assert.equal(await fund.governance(), owner);
         assert.equal(await fund.token(), dai.address);
         assert.equal(await fund.fof(), fof.address);
-        assert.equal(await fund.tokenA(), bamTokenA.address);
-        assert.equal(await fund.tokenB(), bamTokenB.address);
+        assert.equal(await fund.tokenA(), wtfTokenA.address);
+        assert.equal(await fund.tokenB(), wtfTokenB.address);
 
 
     });
@@ -125,12 +125,12 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         assert.equal(await fund.getPoolStatus(), 0);
         assert.equal(await dai.balanceOf(fund.address), 0);
 
-        let bamABef = await bamTokenA.balanceOf(owner);
-        assert.equal(bamABef, 0);
+        let wtfABef = await wtfTokenA.balanceOf(owner);
+        assert.equal(wtfABef, 0);
 
         await fund.deposit(0, 1000);
-        let bamAAft = await bamTokenA.balanceOf(owner);
-        assert.equal(bamAAft, 1000)
+        let wtfAAft = await wtfTokenA.balanceOf(owner);
+        assert.equal(wtfAAft, 1000)
         assert.equal(await dai.balanceOf(fund.address), 1000);
 
         let stratBlock = await time.latestBlock();
@@ -154,12 +154,12 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         //console.log("lastBillingCycle:" + fund0[6])
         assert.equal(fund0[7], 0);//status
 
-        let bamBBef = await bamTokenB.balanceOf(owner);
-        assert.equal(bamBBef, 0);
+        let wtfBBef = await wtfTokenB.balanceOf(owner);
+        assert.equal(wtfBBef, 0);
 
         await fund.deposit(1, 2000);
-        let bamBAft = await bamTokenB.balanceOf(owner);
-        assert.equal(bamBAft, 2000)
+        let wtfBAft = await wtfTokenB.balanceOf(owner);
+        assert.equal(wtfBAft, 2000)
         assert.equal(await dai.balanceOf(fund.address), 3000);
 
         let fund1 = await fund.fund_(1)
@@ -198,7 +198,7 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         assert.equal(fund0[2], 0);//mirrorStake
         await expectRevert(fund.withdraw(0, 100), "Insufficient balance");
         assert.equal(await dai.balanceOf(fund.address), 2000);
-        assert.equal(await bamTokenA.balanceOf(owner), 0);
+        assert.equal(await wtfTokenA.balanceOf(owner), 0);
 
         await fund.withdraw(1, 2000);
         fund1 = await fund.fund_(1);
@@ -207,7 +207,7 @@ contract('Fund', ([owner, alice, rewardAddr]) => {
         assert.equal(fund1[2], 0);//mirrorStake
 
         assert.equal(await dai.balanceOf(fund.address), 0);
-        assert.equal(await bamTokenB.balanceOf(owner), 0);
+        assert.equal(await wtfTokenB.balanceOf(owner), 0);
 
 
     });
