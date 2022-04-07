@@ -142,17 +142,17 @@ contract Fund is ReentrancyGuard {
         Account storage user = account_[msg.sender][_fid];
         FundPool storage pool = fund_[_fid];
         require(pool.status == poolStatus.pending, "!pending");
-        WTFFundERC20 token = _fid == 0 ? tokenA : tokenB;
+        WTFFundERC20 wtfToken = _fid == 0 ? tokenA : tokenB;
         uint256 _before = token.balanceOf(address(this));
         IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
         uint256 _after = token.balanceOf(address(this));
         _amount = _after.sub(_before);
-        if (token.totalSupply() == 0) {
-            token.mint(msg.sender, _amount);
+        if (wtfToken.totalSupply() == 0) {
+            wtfToken.mint(msg.sender, _amount);
             pool.currentLPToken = pool.currentLPToken.add(_amount);
         } else {
-            uint256 amount = _amount.mul(token.totalSupply()).div(pool.currentAmount.add(pool.currentStake));
-            token.mint(msg.sender, amount);
+            uint256 amount = _amount.mul(wtfToken.totalSupply()).div(pool.currentAmount.add(pool.currentStake));
+            wtfToken.mint(msg.sender, amount);
             pool.currentLPToken = pool.currentLPToken.add(amount);
         }
 
@@ -169,16 +169,16 @@ contract Fund is ReentrancyGuard {
         Account storage user = account_[msg.sender][_fid];
         FundPool storage pool = fund_[_fid];
         require(pool.status == poolStatus.pending, "!pending");
-        WTFFundERC20 token = _fid == 0 ? tokenA : tokenB;
-        require(token.balanceOf(msg.sender) >= _amount, "Insufficient balance");
-        TransferHelper.safeTransferFrom(address(token), msg.sender, address(this), _amount);
+        WTFFundERC20 wtfToken = _fid == 0 ? tokenA : tokenB;
+        require(wtfToken.balanceOf(msg.sender) >= _amount, "Insufficient balance");
+        TransferHelper.safeTransferFrom(address(wtfToken), msg.sender, address(this), _amount);
         EnumerableSet.AddressSet storage stakeAddress = _fid == 0 ? stake0Address : stake1Address;
         EnumerableSet.AddressSet storage redeemAddress = _fid == 0 ? redeem0Address : redeem1Address;
         if (user.stake > 0) {
 
-            uint256 amount = user.stake.mul(token.totalSupply()).div(pool.currentAmount.add(pool.currentStake));
+            uint256 amount = user.stake.mul(wtfToken.totalSupply()).div(pool.currentAmount.add(pool.currentStake));
             if (amount >= _amount) {
-                uint256 redeem = _amount.mul(pool.currentAmount.add(pool.currentStake)).div(token.totalSupply());
+                uint256 redeem = _amount.mul(pool.currentAmount.add(pool.currentStake)).div(wtfToken.totalSupply());
                 user.stake = user.stake.sub(redeem);
                 if (user.stake <= 0) {
                     EnumerableSet.remove(stakeAddress, msg.sender);
@@ -187,14 +187,14 @@ contract Fund is ReentrancyGuard {
                 pool.mirrorStake = pool.mirrorStake.sub(redeem);
                 IERC20(token).safeTransfer(msg.sender, redeem);
                 emit WithdrawStake(msg.sender, _fid, redeem);
-                token.burn(_amount);
+                wtfToken.burn(_amount);
                 pool.currentLPToken = pool.currentLPToken.sub(_amount);
             } else {
                 pool.currentStake = pool.currentStake.sub(user.stake);
                 pool.mirrorStake = pool.mirrorStake.sub(user.stake);
                 IERC20(token).safeTransfer(msg.sender, user.stake);
                 emit WithdrawStake(msg.sender, _fid, user.stake);
-                token.burn(amount);
+                wtfToken.burn(amount);
                 pool.currentLPToken = pool.currentLPToken.sub(amount);
                 user.stake = 0;
                 EnumerableSet.remove(stakeAddress, msg.sender);
