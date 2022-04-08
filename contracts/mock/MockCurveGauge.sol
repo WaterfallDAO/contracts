@@ -31,7 +31,7 @@ contract MockCurveGauge {
         balance[msg.sender] -= _amount;
     }
 
-    function balanceOf(address _addr) public view returns (uint256){        
+    function balanceOf(address _addr) public view returns (uint256){
         return balance[_addr];
     }
 }

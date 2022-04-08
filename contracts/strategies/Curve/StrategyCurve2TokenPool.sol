@@ -215,7 +215,7 @@ contract StrategyCurve2TokenPool {
         uint256 price = ICurveDeposit(curveDeposit).get_virtual_price();
         uint256 _amount = gaugeBalance.mul(price);
         //renBTC and wBTC decmials is 8
-        return _amount.div(1e10).div(1e18);
+        return _amount.div(1e18);
     }
 
     function balanceOf() public view returns (uint256) {
