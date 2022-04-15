@@ -44,12 +44,7 @@ contract AddressListRegistry {
 
     constructor(address _dispatcher) public {
         DISPATCHER = _dispatcher;
-        ListInfo storage listInfo;
-        listInfo.owner = address(0);
-        listInfo.updateType = UpdateType.None;
-
-        // Create the first list as completely empty and immutable, to protect the default `id`
-        lists.push(listInfo);
+        //        lists.push(ListInfo({owner: address(0), updateType: UpdateType.None}));
     }
 
 
@@ -84,12 +79,13 @@ contract AddressListRegistry {
     ) external returns (uint256 id_) {
         id_ = getListCount();
 
-        ListInfo storage listInfo;
-        listInfo.owner = _owner;
-        listInfo.updateType = _updateType;
-//        listInfo.itemToIsInList
+//        ListInfo storage listInfo;
+//        listInfo.owner = _owner;
+//        listInfo.updateType = _updateType;
+//        listInfo.itemToIsInList[address(0)] = false;
 
-        lists.push(listInfo);
+        //todo
+        //        lists.push(listInfo);
 
         emit ListCreated(msg.sender, _owner, id_, _updateType);
 
