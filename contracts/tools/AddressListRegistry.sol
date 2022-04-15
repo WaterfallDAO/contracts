@@ -44,9 +44,12 @@ contract AddressListRegistry {
 
     constructor(address _dispatcher) public {
         DISPATCHER = _dispatcher;
+        ListInfo storage listInfo;
+        listInfo.owner = address(0);
+        listInfo.updateType = UpdateType.None;
 
         // Create the first list as completely empty and immutable, to protect the default `id`
-        lists.push(ListInfo({owner: address(0), updateType: UpdateType.None}));
+        lists.push(listInfo);
     }
 
 
@@ -81,7 +84,12 @@ contract AddressListRegistry {
     ) external returns (uint256 id_) {
         id_ = getListCount();
 
-        lists.push(ListInfo({owner: _owner, updateType: _updateType}));
+        ListInfo storage listInfo;
+        listInfo.owner = _owner;
+        listInfo.updateType = _updateType;
+//        listInfo.itemToIsInList
+
+        lists.push(listInfo);
 
         emit ListCreated(msg.sender, _owner, id_, _updateType);
 
@@ -114,8 +122,8 @@ contract AddressListRegistry {
     }
 
     function setListUpdateType(uint256 _id, UpdateType _nextUpdateType)
-        external
-        onlyListOwner(_id)
+    external
+    onlyListOwner(_id)
     {
         UpdateType prevUpdateType = getListUpdateType(_id);
         require(
@@ -141,15 +149,15 @@ contract AddressListRegistry {
     function __isListOwner(address _who, uint256 _id) private view returns (bool isListOwner_) {
         address owner = getListOwner(_id);
         return
-            _who == owner ||
-            (owner == getDispatcher() && _who == IDispatcher(getDispatcher()).getOwner());
+        _who == owner ||
+        (owner == getDispatcher() && _who == IDispatcher(getDispatcher()).getOwner());
     }
 
 
     function areAllInList(uint256 _id, address[] memory _items)
-        external
-        view
-        returns (bool areAllInList_)
+    external
+    view
+    returns (bool areAllInList_)
     {
         for (uint256 i; i < _items.length; i++) {
             if (!isInList(_id, _items[i])) {
@@ -161,9 +169,9 @@ contract AddressListRegistry {
     }
 
     function areAllNotInList(uint256 _id, address[] memory _items)
-        external
-        view
-        returns (bool areAllNotInList_)
+    external
+    view
+    returns (bool areAllNotInList_)
     {
         for (uint256 i; i < _items.length; i++) {
             if (isInList(_id, _items[i])) {
@@ -175,9 +183,9 @@ contract AddressListRegistry {
     }
 
     function areAllInAllLists(uint256[] memory _ids, address[] memory _items)
-        external
-        view
-        returns (bool areAllInAllLists_)
+    external
+    view
+    returns (bool areAllInAllLists_)
     {
         for (uint256 i; i < _items.length; i++) {
             if (!isInAllLists(_ids, _items[i])) {
@@ -189,9 +197,9 @@ contract AddressListRegistry {
     }
 
     function areAllInSomeOfLists(uint256[] memory _ids, address[] memory _items)
-        external
-        view
-        returns (bool areAllInSomeOfLists_)
+    external
+    view
+    returns (bool areAllInSomeOfLists_)
     {
         for (uint256 i; i < _items.length; i++) {
             if (!isInSomeOfLists(_ids, _items[i])) {
@@ -203,9 +211,9 @@ contract AddressListRegistry {
     }
 
     function areAllNotInAnyOfLists(uint256[] memory _ids, address[] memory _items)
-        external
-        view
-        returns (bool areAllNotInAnyOfLists_)
+    external
+    view
+    returns (bool areAllNotInAnyOfLists_)
     {
         for (uint256 i; i < _items.length; i++) {
             if (isInSomeOfLists(_ids, _items[i])) {
@@ -217,9 +225,9 @@ contract AddressListRegistry {
     }
 
     function isInAllLists(uint256[] memory _ids, address _item)
-        public
-        view
-        returns (bool isInAllLists_)
+    public
+    view
+    returns (bool isInAllLists_)
     {
         for (uint256 i; i < _ids.length; i++) {
             if (!isInList(_ids[i], _item)) {
@@ -231,9 +239,9 @@ contract AddressListRegistry {
     }
 
     function isInSomeOfLists(uint256[] memory _ids, address _item)
-        public
-        view
-        returns (bool isInSomeOfLists_)
+    public
+    view
+    returns (bool isInSomeOfLists_)
     {
         for (uint256 i; i < _ids.length; i++) {
             if (isInList(_ids[i], _item)) {
