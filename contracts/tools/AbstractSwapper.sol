@@ -56,7 +56,7 @@ abstract contract AbstractSwapperBase is ConstantMixin {
             require(amount > 0, " empty value in _assetsToIntegrateeAmounts");
 
             // Incoming ETH amounts can be ignored
-            if (asset == ETH_ADDRESS) {
+            if (asset == MAX_ADDRESS) {
                 continue;
             }
             ERC20(asset).safeTransferFrom(_trader, address(this), amount);
@@ -70,7 +70,7 @@ abstract contract AbstractSwapperBase is ConstantMixin {
             require(asset != address(0), " empty value in _assetsFromIntegratee");
             require(amount > 0, " empty value in _assetsFromIntegrateeAmounts");
 
-            if (asset == ETH_ADDRESS) {
+            if (asset == MAX_ADDRESS) {
                 _trader.transfer(amount);
             } else {
                 ERC20(asset).safeTransfer(_trader, amount);
