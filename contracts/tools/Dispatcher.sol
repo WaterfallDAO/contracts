@@ -1,6 +1,6 @@
 pragma solidity ^0.8.4;
 
-import "../interfaces/IDispatcher.sol";
+import "../../interfaces/IDispatcher.sol";
 import "../../interfaces/IMigratableVault.sol";
 import "../../interfaces/IMigrationHookHandler.sol";
 import "../vaults/VaultProxy.sol";
