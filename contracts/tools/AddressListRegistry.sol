@@ -1,7 +1,7 @@
 pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
-import "../interfaces/IDispatcher.sol";
+import "../../interfaces/IDispatcher.sol";
 
 contract AddressListRegistry {
     enum UpdateType {None, AddOnly, RemoveOnly, AddAndRemove}
