@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../../interfaces/uniswap/TransferHelper.sol";
 import "./WTFFundERC20.sol";
-import "../interfaces/IFof.sol";
+import "../../interfaces/IFof.sol";
 
 contract Fund is ReentrancyGuard {
     using SafeMath for uint256;
